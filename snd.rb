@@ -30,13 +30,14 @@ end
 
 module SND
   NAME = 'Summoner Name Database'
-  API_KEY = 'RGAPI-b2a2d9f7-b992-4a15-bf21-0f80da7f8faa'
   DBNAME = 'snd_'
   DBEXT = '.sqlite3'
 
   class RiotAPI
     def initialize(server)
-      @api_key = API_KEY
+      abort 'You need to create api_key.txt' unless File.exist?('./api_key.txt')
+
+      @api_key = File.read('./api_key.txt')
       @interval = 1
       @server = server
     end

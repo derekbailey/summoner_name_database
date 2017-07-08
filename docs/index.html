@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+
+<h1 id="summoner-name-database">Summoner Name Database</h1>
+<p>This application is a command line tool to record and search change history of summoner name.</p>
+
+<p><a href="https://github.com/derekbailey/summoner_name_database">GitHub</a></p>
+
+<h2 id="requirements">Requirements</h2>
+<ul>
+  <li>Ruby</li>
+  <li>SQLite</li>
+</ul>
+
+<h2 id="setup">Setup</h2>
+<ul>
+  <li>Download this script, <code>snd.rb</code>.</li>
+  <li>Get Riot API Key from https://developer.riotgames.com/ and write it to <code>api_key.txt</code> in same dir with this script.</li>
+  <li>Add <code>DATABASE_URL</code> to env vars. (Optional)</li>
+</ul>
+
+<h2 id="usage">Usage</h2>
+<ol>
+  <li>Add summoner info.</li>
+  <li>Update database regularly.</li>
+  <li>Find names.</li>
+</ol>
+
+<h3 id="commands">Commands</h3>
+
+<pre><code>ruby snd.rb add &lt;server&gt; &lt;summoner_name&gt;
+ruby snd.rb add_id &lt;server&gt; &lt;summoner_id&gt;
+ruby snd.rb update &lt;server&gt;
+ruby snd.rb find &lt;server&gt; &lt;keyword&gt;
+ruby snd.rb find_id &lt;server&gt; &lt;summoner_id&gt;
+ruby snd.rb list &lt;server&gt;
+</code></pre>
+
+<h3 id="examples">Examples</h3>
+
+<pre><code>ruby snd.rb add kr hideonbush
+ruby snd.rb update kr
+ruby snd.rb find kr bush
+</code></pre>
+
+<h2 id="disclaimer">Disclaimer</h2>
+<p>Summoner Name Database isn’t endorsed by Riot Games and doesn’t reflect the views or opinions of Riot Games or anyone officially involved in producing or managing League of Legends. League of Legends and Riot Games are trademarks or registered trademarks of Riot Games, Inc. League of Legends © Riot Games, Inc.</p>
+
+</div>
+</body>
+</html>
