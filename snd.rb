@@ -34,15 +34,32 @@ module SND
   DBEXT = '.sqlite3'
 
   class RiotAPI
+    ENDPOINTS = {
+      br: 'br1.api.riotgames.com',
+      eune: 'eun1.api.riotgames.com',
+      euw: 'euw1.api.riotgames.com',
+      jp: 'jp1.api.riotgames.com',
+      kr: 'kr.api.riotgames.com',
+      lan: 'la1.api.riotgames.com',
+      las: 'la2.api.riotgames.com',
+      na: 'na1.api.riotgames.com',
+      oce: 'oc1.api.riotgames.com',
+      tr: 'tr1.api.riotgames.com',
+      ru: 'ru.api.riotgames.com',
+      pbe: 'pbe1.api.riotgames.com'
+    }
+
     def initialize(server)
       abort 'You need to create api_key.txt' unless File.exist?('./api_key.txt')
 
       @api_key = File.read('./api_key.txt')
-      @interval = 1
+      @interval = 1.2
       @server = server
     end
 
-    def _request(url)
+    def _request(path)
+      host = "https://#{ENDPOINTS[@server.to_sym]}"
+      url = host + path + "?api_key=#{@api_key}"
       result = JSON.parse(open(url).read)
       sleep @interval
       result
@@ -53,21 +70,15 @@ module SND
     end
 
     def find_by_name(summoner_name)
-      validated_name = _validate(summoner_name)
-      res = _request("https://#{@server}.api.pvp.net/api/lol/#{@server}/v1.4/summoner/by-name/#{validated_name}?api_key=#{@api_key}")
-      res.values.first['id']
+      summoner_name = _validate(summoner_name)
+      res = _request("/lol/summoner/v3/summoners/by-name/#{summoner_name}")
+      res['id'].to_s
     end
 
     def find_by_id(summoner_id)
-      res = _request("https://#{@server}.api.pvp.net/api/lol/#{@server}/v1.4/summoner/#{summoner_id}/name?api_key=#{@api_key}")
-      name = res[summoner_id.to_s]
-
-      # jp server
-      if name.class == Hash
-        name['name']
-      else
-        name
-      end
+      summoner_id = summoner_id.to_s
+      res = _request("/lol/summoner/v3/summoners/#{summoner_id}")
+      res['name'].to_s
     end
   end
 
@@ -113,7 +124,7 @@ module SND
     end
 
     def update
-      @logger.info "Run @#{NAME.colorize(:green)} -> #{@server}"
+      @logger.info "Run @#{NAME.colorize(:green)} -> #{@server.upcase}"
       Summoner.all.each do |summoner|
         update_summoner(summoner)
       end
