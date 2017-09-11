@@ -251,6 +251,25 @@ module SND
       puts "\n"
     end
   end
+
+  class Ladder
+    def self.get(server, num = 50)
+      num = num.to_i
+      num = 50 if num < 50
+      server = 'www' if server == 'kr'
+
+      list = []
+      (num / 50).times do |i|
+        url = "http://#{server}.op.gg/ranking/ajax2/ladders/start=#{i*50}"
+        open(url).readlines.each do |line|
+          if line.match(/op\.gg\/summoner\/userName=(.*?)"/)
+            list << CGI.unescape($1)
+          end
+        end
+      end
+      list.uniq
+    end
+  end
 end
 
 class SNDCommand < Thor
@@ -284,6 +303,13 @@ class SNDCommand < Thor
   desc 'find_id <server> <summoner_id>', 'Find account by summoner id'
   def find_id(server, summoner_id)
     SND::App.new(server).find_id(summoner_id)
+  end
+
+  desc 'ladder <server> <size>', 'Add summoner from ladder'
+  def ladder(server, size)
+    snd = SND::App.new(server)
+    list = SND::Ladder.get(server, size)
+    list.map {|name| snd.add(name) }
   end
 end
 
