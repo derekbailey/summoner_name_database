@@ -100,7 +100,8 @@ module SND
       abort 'You need to create api_key.txt' unless File.exist?('./api_key.txt')
 
       @api_key = File.read('./api_key.txt')
-      @interval = 1.4
+      # @interval = 1.4 # for dev key: 20req/1sec, 100req/2min
+      @interval = 0.04 # for production key: 50req/1sec
       @server = server
     end
 
