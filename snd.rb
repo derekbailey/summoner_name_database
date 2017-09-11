@@ -1,10 +1,9 @@
-require 'data_mapper'
-require 'colorize'
-require 'json'
-require 'thor'
+require 'bundler'
+Bundler.require
 
 require 'open-uri'
 require 'logger'
+require 'json'
 require 'cgi'
 require 'pp'
 
@@ -88,10 +87,12 @@ module SND
       DataMapper.finalize
       DataMapper.auto_upgrade!
 
-      logger = Logger.new(STDOUT)
-      logger.formatter = proc do |severity, datetime, _progname, msg|
-        "#{datetime.strftime('%Y-%m-%d %H:%M:%S')} [#{severity}] #{msg}\n"
-      end
+      logger = Logger.new(
+        STDOUT,
+        formatter: proc {|severity, datetime, progname, msg|
+          "#{datetime} [#{severity}] #{msg}\n"
+        }
+      )
 
       @client = RiotAPI.new(server)
       @server = server
