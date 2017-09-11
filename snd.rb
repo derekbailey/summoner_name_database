@@ -14,6 +14,7 @@ class Summoner
   property :uid, Text, required: true, unique: true
 
   has n, :names
+  has n, :ranks
 end
 
 class Name
@@ -25,6 +26,53 @@ class Name
   property :date,        DateTime, required: true
 
   belongs_to :summoner
+end
+
+class Rank
+  include DataMapper::Resource
+
+  property :id,          Serial
+  property :summoner_id, Integer, required: true
+  property :peak,        Text
+  property :date,        DateTime
+
+  belongs_to :summoner
+
+  def self.define
+    hash = {}
+    hash['CHALLENGER I'] = 0
+    hash['MASTER I'] = 1
+    index = 2
+    %w(DIAMOND PLATINUM GOLD SILVER BRONZE).each do |tier|
+      %w(I II III IV V).each do |div|
+        hash["#{tier} #{div}"] = index
+        index = index.next
+      end
+    end
+    hash['UNRANKED'] = index
+    hash
+  end
+
+  # return true if x is higher than y, false if not.
+  def self.compare_by_rank(x, y)
+    reg = /(?<tier>[a-zA-Z]+\s?[IV]+)?(\s)?(?<lp>-?[0-9]+)?(LP)?/
+    ranks = define
+    x = x.match(reg)
+    y = y.match(reg)
+    if x[:tier] != y[:tier]
+      if 1 == ((ranks[x[:tier]] || 9999) <=> (ranks[y[:tier]] || 9999))
+        false
+      else
+        true
+      end
+    else
+      if 1 == (y[:lp].to_i <=> x[:lp].to_i) || 0 == (y[:lp].to_i <=> x[:lp].to_i)
+        false
+      else
+        true
+      end
+    end
+  end
 end
 
 module SND
@@ -52,7 +100,7 @@ module SND
       abort 'You need to create api_key.txt' unless File.exist?('./api_key.txt')
 
       @api_key = File.read('./api_key.txt')
-      @interval = 1.2
+      @interval = 1.4
       @server = server
     end
 
@@ -68,16 +116,33 @@ module SND
       CGI.escape(name.encode('UTF-8').downcase.gsub(/\s/, ''))
     end
 
-    def find_by_name(summoner_name)
+    def find_id_by_name(summoner_name)
       summoner_name = _validate(summoner_name)
       res = _request("/lol/summoner/v3/summoners/by-name/#{summoner_name}")
       res['id'].to_s
     end
 
-    def find_by_id(summoner_id)
+    def find_name_by_id(summoner_id)
       summoner_id = summoner_id.to_s
       res = _request("/lol/summoner/v3/summoners/#{summoner_id}")
       res['name'].to_s
+    end
+
+    def find_rank_by_id(summoner_id)
+      summoner_id = summoner_id.to_s
+      leagues = _request("/lol/league/v3/leagues/by-summoner/#{summoner_id}")
+      leagues.each do |league|
+        if league['queue'] == 'RANKED_SOLO_5x5'
+          league['entries'].each do |player|
+            if player['playerOrTeamId'] == summoner_id
+              return "#{league['tier']} #{player['rank']} #{player['leaguePoints']}LP"
+            end
+          end
+        end
+      end
+      'UNRANKED'
+    rescue
+      'UNRANKED'
     end
   end
 
@@ -109,15 +174,17 @@ module SND
     end
 
     def add(summoner_name)
-      sum_id = @client.find_by_name(summoner_name)
+      sum_id = @client.find_id_by_name(summoner_name)
       add_id(sum_id)
     end
 
     def add_id(summoner_id)
-      sum_name = @client.find_by_id(summoner_id)
+      sum_name = @client.find_name_by_id(summoner_id)
+      sum_rank = @client.find_rank_by_id(summoner_id)
       sum = Summoner.create(uid: summoner_id)
       if sum.id
         sum.names.create(ign: sum_name, date: Time.now)
+        sum.ranks.create(peak: sum_rank, date: Time.now)
         @logger.info "Success: #{sum_name.colorize(:blue)}"
       end
     rescue => e
@@ -132,12 +199,20 @@ module SND
     end
 
     def update_summoner(summoner)
-      new_name = @client.find_by_id(summoner.uid)
+      new_name = @client.find_name_by_id(summoner.uid)
       old_name = summoner.names.last.ign || nil
+
+      new_rank = @client.find_rank_by_id(summoner.uid)
+      old_rank = summoner.ranks.last.peak rescue 'UNRANKED'
 
       if new_name != old_name || old_name.nil?
         summoner.names.create(ign: new_name, date: Time.now)
         @logger.info "Update: #{old_name.colorize(:blue)} -> #{new_name.colorize(:blue)}"
+      end
+
+      if Rank.compare_by_rank(new_rank, old_rank)
+        summoner.ranks.create(peak: new_rank)
+        @logger.info "Update: #{new_name.colorize(:blue)} -> #{new_rank.colorize(:orange)}"
       end
     rescue => e
       @logger.error "Error: #{summoner.names.last.ign} -> #{e.message}"
@@ -155,7 +230,7 @@ module SND
 
       names.each do |name|
         names = Summoner.all(id: name.summoner_id).names
-        puts "---History: #{names.last.ign} [#{names.last.summoner.uid}]"
+        puts "---History: #{names.last.ign} [#{names.last.summoner.uid}] (Peak rank: #{names.last.summoner.ranks.last.peak})"
         names.reverse_each do |n|
           puts "#{n.date.to_s.split('T').first} #{n.ign.colorize(:blue)}"
         end
