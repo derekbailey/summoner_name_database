@@ -1,5 +1,6 @@
-require 'bundler'
-Bundler.require
+require 'data_mapper'
+require 'colorize'
+require 'thor'
 
 require 'open-uri'
 require 'logger'
@@ -97,9 +98,10 @@ module SND
     }
 
     def initialize(server)
-      abort 'You need to create api_key.txt' unless File.exist?('./api_key.txt')
+      path = File.expand_path('../api_key.txt', __FILE__)
+      abort 'You need to create api_key.txt' unless File.exist?(path)
 
-      @api_key = File.read('./api_key.txt')
+      @api_key ||= File.read(path)
       # @interval = 1.4 # for dev key: 20req/1sec, 100req/2min
       @interval = 0.04 # for production key: 50req/1sec
       @server = server
