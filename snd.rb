@@ -316,7 +316,7 @@ class SNDCommand < Thor
 end
 
 if __FILE__ == $PROGRAM_NAME
-  args = ARGV.map {|s| s.encode('utf-8', Encoding.find('locale').to_s) }
+  args = ARGV.map {|s| s.encode('utf-8', Encoding.default_external) }
   regions = 'na kr jp br tr euw eue oce las lan ru'.split(' ').join('|')
 
   if args[1]
