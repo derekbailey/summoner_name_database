@@ -103,7 +103,7 @@ module SND
 
       @api_key ||= File.read(path)
       # @interval = 1.4 # for dev key: 20req/1sec, 100req/2min
-      @interval = 0.04 # for production key: 50req/1sec
+      @interval = 0.08 # for production key: 50req/1sec
       @server = server
     end
 
@@ -179,6 +179,8 @@ module SND
     def add(summoner_name)
       sum_id = @client.find_id_by_name(summoner_name)
       add_id(sum_id)
+    rescue => e
+      @logger.error "#{summoner_name} -> #{e.message}"
     end
 
     def add_id(summoner_id)
@@ -191,7 +193,7 @@ module SND
         @logger.info "Success: #{sum_name.colorize(:blue)}"
       end
     rescue => e
-      @logger.error "Error: #{summoner_id} -> #{e.message}"
+      @logger.error "#{summoner_id} -> #{e.message}"
     end
 
     def update
@@ -218,7 +220,7 @@ module SND
         @logger.info "Update: #{new_name.colorize(:blue)} -> #{new_rank.colorize(:orange)}"
       end
     rescue => e
-      @logger.error "Error: #{summoner.names.last.ign} -> #{e.message}"
+      @logger.error "#{summoner.names.last.ign} -> #{e.message}"
     end
 
     def list
