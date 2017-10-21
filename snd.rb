@@ -169,8 +169,8 @@ module SND
 
     def db_path(server)
       file_name = "#{DBNAME}#{server}#{DBEXT}"
-      if ENV['DATABASE_URL']
-        'sqlite3:' + File.join(ENV['DATABASE_URL'], file_name)
+      if ENV['DATABASE_DIR']
+        'sqlite3:' + File.join(ENV['DATABASE_DIR'], file_name)
       else
         'sqlite3:' + File.expand_path(File.join(File.dirname(__FILE__), file_name))
       end
