@@ -337,10 +337,9 @@ end
 
 if __FILE__ == $PROGRAM_NAME
   args = ARGV.map {|s| s.encode('utf-8', Encoding.default_external) }
-  regions = 'na kr jp br tr euw eue oce las lan ru'.split(' ').join('|')
 
-  if args[1]
-    abort 'Error: incorrect args.' unless args[1].match(/#{regions}/)
+  unless 'na kr jp br tr euw eue oce las lan ru'.split(' ').index(args[1])
+    abort 'Error: incorrect args.'
   end
 
   SNDCommand.start(args)
