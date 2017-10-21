@@ -258,6 +258,10 @@ module SND
     def id2name(summoner_id)
       puts @client.find_name_by_id(summoner_id)
     end
+
+    def name2id(summoner_name)
+      puts @client.find_id_by_name(summoner_name)
+    end
   end
 
   class Ladder
@@ -323,6 +327,11 @@ class SNDCommand < Thor
   desc 'id2name <server> <id>', 'Convert summoner name from summoner id'
   def id2name(server, id)
     SND::App.new(server).id2name(id)
+  end
+
+  desc 'name2id <server> <name>', 'Convert summoner id from summoner name'
+  def name2id(server, id)
+    SND::App.new(server).name2id(id)
   end
 end
 
