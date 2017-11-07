@@ -98,6 +98,8 @@ module SND
     }
 
     def initialize(server)
+      abort 'Error: Unknown server' unless ENDPOINTS.keys.map(&:to_s).index(server)
+
       path = File.expand_path('../api_key.txt', __FILE__)
       abort 'You need to create api_key.txt' unless File.exist?(path)
 
@@ -337,10 +339,5 @@ end
 
 if __FILE__ == $PROGRAM_NAME
   args = ARGV.map {|s| s.encode('utf-8', Encoding.default_external) }
-
-  unless 'na kr jp br tr euw eue oce las lan ru'.split(' ').index(args[1])
-    abort 'Error: incorrect args.'
-  end
-
   SNDCommand.start(args)
 end
