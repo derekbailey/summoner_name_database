@@ -135,14 +135,10 @@ module SND
 
     def find_rank_by_id(summoner_id)
       summoner_id = summoner_id.to_s
-      leagues = _request("/lol/league/v3/leagues/by-summoner/#{summoner_id}")
+      leagues = _request("/lol/league/v3/positions/by-summoner/#{summoner_id}")
       leagues.each do |league|
-        if league['queue'] == 'RANKED_SOLO_5x5'
-          league['entries'].each do |player|
-            if player['playerOrTeamId'] == summoner_id
-              return "#{league['tier']} #{player['rank']} #{player['leaguePoints']}LP"
-            end
-          end
+        if league['queueType'] == 'RANKED_SOLO_5x5'
+          return "#{league['tier']} #{league['rank']} #{league['leaguePoints']}LP"
         end
       end
       'UNRANKED'
