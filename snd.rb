@@ -233,7 +233,9 @@ module SND
 
       names.each do |name|
         names = Summoner.all(id: name.summoner_id).names
-        puts "---History: #{names.last.ign} [#{names.last.summoner.uid}] (Peak rank: #{names.last.summoner.ranks.last.peak})"
+        if names.last.summoner.ranks.size > 0
+          puts "---History: #{names.last.ign} [#{names.last.summoner.uid}] (Peak rank: #{names.last.summoner.ranks.last.peak})"
+        end
         names.reverse_each do |n|
           puts "#{n.date.to_s.split('T').first} #{n.ign.colorize(:blue)}"
         end
