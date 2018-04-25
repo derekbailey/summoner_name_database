@@ -267,6 +267,12 @@ module SND
     def name2id(summoner_name)
       puts @client.find_id_by_name(summoner_name)
     end
+
+    def rank(summoner_name)
+      id = @client.find_id_by_name(summoner_name)
+      new_rank = @client.find_rank_by_id(id)
+      puts new_rank
+    end
   end
 
   class Ladder
@@ -337,6 +343,11 @@ class SNDCommand < Thor
   desc 'name2id <server> <name>', 'Convert summoner id from summoner name'
   def name2id(server, id)
     SND::App.new(server).name2id(id)
+  end
+
+  desc 'rank <server>', 'Show current rank'
+  def rank(server, summoner_name)
+    SND::App.new(server).rank(summoner_name)
   end
 end
 
