@@ -1,12 +1,17 @@
-require 'data_mapper'
-require 'colorize'
-require 'thor'
-
+require 'bundle/inline'
 require 'open-uri'
 require 'logger'
 require 'json'
 require 'cgi'
 require 'pp'
+
+gemfile(true) do
+    source 'https://rubygems.org'
+    gem 'data_mapper', '1.2.0'
+    gem 'dm-sqlite-adapter', '1.2.0', require: false
+    gem 'colorize', '0.8.1'
+    gem 'thor', '0.20.0'
+end
 
 class Summoner
   include DataMapper::Resource

@@ -11,7 +11,7 @@ This application is a command line tool to record and search change history of s
 - Download this script.
 - Get Riot API Key from https://developer.riotgames.com/ and write it to `api_key.txt` in same dir with this script.
 - Add `DATABASE_DIR` to env vars. (Optional)
-- Install gems, `bundle install`
+- Install gems, `ruby snd.rb`
 
 ## Usage
 1. Add summoner info.
