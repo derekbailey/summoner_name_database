@@ -193,7 +193,7 @@ module SND
       if sum.id
         sum.names.create(ign: sum_name, date: Time.now)
         sum.ranks.create(peak: sum_rank, date: Time.now)
-        @logger.info "Success: #{sum_name.colorize(:blue)}"
+        @logger.info "Success: #{summoner_id} -> #{sum_name.colorize(:blue)}"
       end
     rescue => e
       @logger.error "#{summoner_id} -> #{e.message}"
