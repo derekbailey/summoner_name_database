@@ -1,11 +1,12 @@
-require 'bundle/inline'
+gem 'json', '1.8.6'
+require 'bundler/inline'
 require 'open-uri'
 require 'logger'
 require 'json'
 require 'cgi'
 require 'pp'
 
-gemfile(true) do
+gemfile do
     source 'https://rubygems.org'
     gem 'data_mapper', '1.2.0'
     gem 'dm-sqlite-adapter', '1.2.0', require: false
