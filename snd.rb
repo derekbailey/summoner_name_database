@@ -7,11 +7,11 @@ require 'cgi'
 require 'pp'
 
 gemfile do
-    source 'https://rubygems.org'
-    gem 'data_mapper', '1.2.0'
-    gem 'dm-sqlite-adapter', '1.2.0', require: false
-    gem 'colorize', '0.8.1'
-    gem 'thor', '0.20.0'
+  source 'https://rubygems.org'
+  gem 'data_mapper', '1.2.0'
+  gem 'dm-sqlite-adapter', '1.2.0', require: false
+  gem 'colorize', '0.8.1'
+  gem 'thor', '0.20.0'
 end
 
 class Summoner
