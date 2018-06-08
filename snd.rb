@@ -261,12 +261,24 @@ module SND
       puts "\n"
     end
 
-    def id2name(summoner_id)
-      puts @client.find_name_by_id(summoner_id)
+    def id2name(summoner_ids)
+      [summoner_ids].concat([]).flatten.each do |id|
+        begin
+          puts @client.find_name_by_id(id)
+        rescue => e
+          puts "Error: #{e.message}"
+        end
+      end
     end
 
-    def name2id(summoner_name)
-      puts @client.find_id_by_name(summoner_name)
+    def name2id(summoner_names)
+      [summoner_names].concat([]).flatten.each do |name|
+        begin
+          puts @client.find_id_by_name(name)
+        rescue => e
+          puts "Error: #{e.message}"
+        end
+      end
     end
 
     def rank(summoner_name)
@@ -336,14 +348,14 @@ class SNDCommand < Thor
     list.map {|name| snd.add(name) }
   end
 
-  desc 'id2name <server> <id>', 'Convert summoner name from summoner id'
-  def id2name(server, id)
-    SND::App.new(server).id2name(id)
+  desc 'id2name <server> <id|ids>', 'Convert summoner name from summoner id'
+  def id2name(server, *ids)
+    SND::App.new(server).id2name(ids)
   end
 
-  desc 'name2id <server> <name>', 'Convert summoner id from summoner name'
-  def name2id(server, id)
-    SND::App.new(server).name2id(id)
+  desc 'name2id <server> <names|names>', 'Convert summoner id from summoner name'
+  def name2id(server, *names)
+    SND::App.new(server).name2id(names)
   end
 
   desc 'rank <server>', 'Show current rank'
