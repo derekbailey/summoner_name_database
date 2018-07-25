@@ -224,7 +224,7 @@ module SND
         @logger.info "Update: #{new_name.colorize(:blue)} -> #{new_rank.colorize(:orange)}"
       end
     rescue => e
-      @logger.error "#{summoner.names.last.ign} -> #{e.message}"
+      @logger.error "#{summoner.inspect} -> #{e.message}"
     end
 
     def list
@@ -285,6 +285,22 @@ module SND
       id = @client.find_id_by_name(summoner_name)
       new_rank = @client.find_rank_by_id(id)
       puts new_rank
+    end
+
+    def restore
+      Summoner.all.each do |summoner|
+        restore_summoner(summoner)
+      end
+    end
+
+    def restore_summoner(summoner)
+      if summoner.names.size.zero?
+        sum_id = summoner.uid
+        summoner.destroy
+        add_id(sum_id)
+      end
+    rescue => e
+      @logger.error "#{summoner.inspect} -> #{e.message}"
     end
   end
 
@@ -361,6 +377,11 @@ class SNDCommand < Thor
   desc 'rank <server>', 'Show current rank'
   def rank(server, summoner_name)
     SND::App.new(server).rank(summoner_name)
+  end
+
+  desc 'restore <server>', 'Restore broken summoner'
+  def restore(server)
+    SND::App.new(server).restore
   end
 end
 
